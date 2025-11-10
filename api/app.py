@@ -116,7 +116,8 @@ def _resolve_firebase_project_id() -> str:
 
 def _initialize_firebase_app() -> firebase_admin.App:
     try:
-        return firebase_admin.get_app()
+        app = firebase_admin.get_app()
+        return app
     except ValueError:
         project_id = _resolve_firebase_project_id()
         logger.info("Initializing Firebase Admin SDK for project %s", project_id)
