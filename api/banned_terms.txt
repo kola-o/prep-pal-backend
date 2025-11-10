@@ -1,0 +1,2 @@
+# Add one lowercase term per line to force uploads to be rejected when the term is present.
+# Lines starting with "#" are ignored. The default profanity filter already covers common words.

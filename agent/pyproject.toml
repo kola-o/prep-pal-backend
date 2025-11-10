@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prep-pal-agent"
+version = "1.0.0"
+description = "Simple AI Tutor built using GCP and LiveKit Agents for Python"
+requires-python = ">=3.11"
+dependencies = [
+    "livekit-agents[google,hedra,turn-detector,elevenlabs]~=1.2",
+    "livekit-plugins-noise-cancellation",
+    "python-dotenv",
+    "vertexai",
+    "pillow",
+    "requests",
+    "websockets",
+    "pydantic",
+    "google-cloud-firestore"
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+]
+
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "B", "A", "C4", "UP", "SIM", "RUF"]
+ignore = ["E501"]  # Line too long (handled by formatter)
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
