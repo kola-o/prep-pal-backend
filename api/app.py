@@ -65,7 +65,6 @@ SESSION_COLLECTION = "session_configs"
 
 BANNED_TERMS_PATH = Path(__file__).with_name("banned_terms.txt")
 
-
 def _load_strict_terms() -> set[str]:
     terms: set[str] = set()
     if not BANNED_TERMS_PATH.exists():
@@ -114,7 +113,6 @@ def _resolve_firebase_project_id() -> str:
     raise RuntimeError(
         f"Missing Firebase project configuration. Set one of the following environment variables: {keys}."
     )
-
 
 def _initialize_firebase_app() -> firebase_admin.App:
     try:
