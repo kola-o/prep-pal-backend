@@ -114,26 +114,37 @@ def _resolve_firebase_project_id() -> str:
         f"Missing Firebase project configuration. Set one of the following environment variables: {keys}."
     )
 
+# def _initialize_firebase_app() -> firebase_admin.App:
+#     try:
+#         return firebase_admin.get_app()
+#     except ValueError:
+#         project_id = _resolve_firebase_project_id()
+#         logger.info("Initializing Firebase Admin SDK for project %s", project_id)
+#         try:
+#             return firebase_admin.initialize_app(
+#                 credentials.ApplicationDefault(),
+#                 {"projectId": project_id},
+#             )
+#         except ValueError:
+#             # Another thread/process initialized between get_app() and initialize_app()
+#             return firebase_admin.get_app()
+#         except Exception as exc:  # pragma: no cover - startup validation
+#             logger.exception("Failed to initialize Firebase Admin SDK")
+#             raise RuntimeError(
+#                 "Could not initialize Firebase Admin SDK. Ensure application default credentials are configured."
+#             ) from exc
+        
 def _initialize_firebase_app() -> firebase_admin.App:
-    try:
-        app = firebase_admin.get_app()
-        return app
-    except ValueError:
+    if not firebase_admin._apps:
         project_id = _resolve_firebase_project_id()
         logger.info("Initializing Firebase Admin SDK for project %s", project_id)
-        try:
-            return firebase_admin.initialize_app(
-                credentials.ApplicationDefault(),
+        default_app = firebase_admin.initialize_app(
+        credentials.ApplicationDefault(),
                 {"projectId": project_id},
-            )
-        except ValueError:
-            # Another thread/process initialized between get_app() and initialize_app()
-            return firebase_admin.get_app()
-        except Exception as exc:  # pragma: no cover - startup validation
-            logger.exception("Failed to initialize Firebase Admin SDK")
-            raise RuntimeError(
-                "Could not initialize Firebase Admin SDK. Ensure application default credentials are configured."
-            ) from exc
+    )
+    return default_app
+
+
 
 
 firebase_app = _initialize_firebase_app()
