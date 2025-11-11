@@ -157,6 +157,7 @@ except Exception as exc:  # pragma: no cover - happens during startup misconfigu
     ) from exc
 
 ALLOWED_ORIGINS = _load_allowed_origins()
+ALLOW_ANONYMOUS_TUTOR = os.getenv("ALLOW_ANONYMOUS_TUTOR", "false").lower() == "true"
 
 
 class AuthenticatedUser(TypedDict):
@@ -181,9 +182,7 @@ def _extract_bearer_token(authorization: str | None) -> str:
     return token.strip()
 
 
-def require_authenticated_user(
-    authorization: str | None = Header(default=None),
-) -> AuthenticatedUser:
+def _decode_authenticated_user(authorization: str | None) -> AuthenticatedUser:
     token = _extract_bearer_token(authorization)
     try:
         decoded = firebase_auth.verify_id_token(token, app=firebase_app)
@@ -207,6 +206,22 @@ def require_authenticated_user(
         email=decoded.get("email"),
         name=decoded.get("name") or decoded.get("displayName"),
     )
+
+
+def require_authenticated_user(
+    authorization: str | None = Header(default=None),
+) -> AuthenticatedUser:
+    return _decode_authenticated_user(authorization)
+
+
+def resolve_session_user(
+    authorization: str | None = Header(default=None),
+) -> AuthenticatedUser:
+    if authorization:
+        return _decode_authenticated_user(authorization)
+    if ALLOW_ANONYMOUS_TUTOR:
+        return AuthenticatedUser(uid=f"anonymous_{uuid4().hex}", email=None, name=None)
+    return _decode_authenticated_user(authorization)
 
 
 app = FastAPI(title="Prep Pal Agent API", version="1.0.0")
@@ -383,7 +398,7 @@ async def create_session_config(
     grade: Annotated[str, Form(...)],
     avatar_id: Annotated[str, Form(...)],
     study_mode: Annotated[str, Form(...)],
-    auth_user: Annotated[AuthenticatedUser, Depends(require_authenticated_user)],
+    auth_user: Annotated[AuthenticatedUser, Depends(resolve_session_user)],
     study_text: Annotated[str | None, Form()] = None,
     study_file: Annotated[UploadFile | None, File()] = None,
 ) -> JSONResponse:

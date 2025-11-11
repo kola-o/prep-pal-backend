@@ -28,11 +28,12 @@ LIVEKIT_API_SECRET=your-livekit-api-secret
 
 HEDRA_API_KEY=your-hedra-api-key
 ELEVEN_API_KEY=your-elevenlabs-api-key
+ALLOW_ANONYMOUS_TUTOR=false  # set true to let the API issue sessions without Firebase auth
 ```
 
 > **Note:** If you cloned this codebase from a private repo, scrub any existing `.env` file for real secrets before committing. Publish placeholders only.
 
-Both the API and the agent load this `.env` via `python-dotenv`.
+Both the API and the agent load this `.env` via `python-dotenv`. If you set `ALLOW_ANONYMOUS_TUTOR=true`, the `/session-config` endpoint will accept requests without a Firebase ID token; leave it `false` in production.
 
 ## Project Layout
 ```
